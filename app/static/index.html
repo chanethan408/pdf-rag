@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit Policy Assistant</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1b1f27; --muted: #5d6675; --line: #e2e5ea;
+    --accent: #c8102e; --accent-ink: #ffffff; --ok: #146c43; --ok-bg: #e6f4ec;
+    --warn: #8a5a00; --warn-bg: #fff4d9; --err: #a4262c; --err-bg: #fdeceb;
+    --hl: #fff3b0; --chip: #eef0f4; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151a; --card: #1b2028; --text: #e8ebf0; --muted: #9aa4b2; --line: #2b323d;
+      --accent: #ef4a63; --accent-ink: #12151a; --ok: #6fd3a0; --ok-bg: #153325;
+      --warn: #f0c262; --warn-bg: #3a2d0f; --err: #ff8f94; --err-bg: #3b1b1d;
+      --hl: #5a4d00; --chip: #262d38; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  h1 { font-size: 1.5rem; margin: 0; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: .95rem; }
+  .topright { display: flex; align-items: center; gap: 12px; }
+  .apilink { font-size: .85rem; font-weight: 600; color: var(--accent); text-decoration: none; }
+  .apilink:hover { text-decoration: underline; }
+  .pill { font-size: .8rem; padding: 4px 10px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.bad { background: var(--err-bg); color: var(--err); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 24px; align-items: start; }
+  aside { position: sticky; top: 16px; }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } aside { position: static; order: -1; } }
+
+  .label { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+
+  /* ask box */
+  .ask { display: flex; gap: 8px; }
+  .ask input { flex: 1; min-width: 0; font: inherit; padding: 12px 14px; color: var(--text); background: var(--card);
+               border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+  .ask input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button.go { font: inherit; font-weight: 600; padding: 0 20px; border: 0; border-radius: 10px; cursor: pointer;
+              background: var(--accent); color: var(--accent-ink); }
+  button.go:disabled { opacity: .6; cursor: progress; }
+  @media (max-width: 520px) { .ask { flex-direction: column; } button.go { padding: 12px; } }
+
+  /* question list */
+  .qlist { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+  .qlist li + li { border-top: 1px solid var(--line); }
+  .qlist button { all: unset; box-sizing: border-box; display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+                  width: 100%; padding: 10px 14px; cursor: pointer; font-size: .95rem; }
+  .qlist button:hover, .qlist button:focus-visible { background: var(--chip); }
+  .tag { flex: none; font-size: .72rem; color: var(--muted); background: var(--chip); padding: 2px 8px; border-radius: 999px; }
+  .tag.decline { background: var(--warn-bg); color: var(--warn); }
+  #questions { margin-top: 18px; }
+
+  /* results */
+  #out { margin-top: 24px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .status { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .status.ok { background: var(--ok-bg); color: var(--ok); }
+  .status.warn { background: var(--warn-bg); color: var(--warn); }
+  .status.err { background: var(--err-bg); color: var(--err); }
+  .answer { font-size: 1.05rem; margin: 0; }
+  .why { margin: 10px 0 0; color: var(--muted); font-size: .92rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);
+          color: var(--muted); font-size: .82rem; }
+  .meta b { color: var(--text); font-weight: 600; }
+  button.cite { font: inherit; font-size: .78rem; font-weight: 700; padding: 0 6px; margin: 0 1px; border-radius: 6px; cursor: pointer;
+                border: 1px solid var(--accent); color: var(--accent); background: transparent; vertical-align: baseline; }
+  button.cite:hover { background: var(--accent); color: var(--accent-ink); }
+  .sources h3 { margin: 24px 0 8px; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  .src { margin-bottom: 10px; scroll-margin-top: 16px; }
+  .src.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash { 0%, 60% { background: var(--hl); } 100% { background: var(--card); } }
+  .srchead { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-bottom: 6px; }
+  .srchead .n { font-weight: 700; color: var(--accent); }
+  .srchead .f { font-weight: 600; }
+  .srchead .d { color: var(--muted); font-size: .85rem; }
+  .srchead a { margin-left: auto; font-size: .85rem; color: var(--accent); text-decoration: none; font-weight: 600; }
+  .srchead a:hover { text-decoration: underline; }
+  .srctext { margin: 0; white-space: pre-wrap; font-size: .9rem; color: var(--muted); }
+  .loading { color: var(--muted); }
+
+  /* documents sidebar */
+  .doc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .doc.cited { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .doc .t { font-weight: 600; font-size: .95rem; }
+  .doc .f { color: var(--muted); font-size: .78rem; word-break: break-all; }
+  .doc .actions { display: flex; gap: 14px; margin-top: 8px; align-items: center; }
+  .doc .open, .doc .remove { font: inherit; font-size: .82rem; font-weight: 600; text-decoration: none; cursor: pointer; padding: 0;
+                             background: none; border: 0; color: var(--accent); }
+  .doc .remove { color: var(--muted); margin-left: auto; }
+  .doc .open:hover, .doc .remove:hover { text-decoration: underline; }
+  .doc .remove:hover { color: var(--err); }
+  .doc .notindexed { font-size: .75rem; color: var(--warn); background: var(--warn-bg); padding: 1px 8px; border-radius: 999px; margin-left: 6px; }
+  .hint { color: var(--muted); font-size: .8rem; margin: 6px 2px 0; }
+  .upload { display: block; width: 100%; font: inherit; font-weight: 600; font-size: .9rem; padding: 10px; margin-bottom: 10px; cursor: pointer;
+            background: var(--card); color: var(--text); border: 1px dashed var(--muted); border-radius: 12px; }
+  .upload:hover, aside.drag .upload { border-color: var(--accent); color: var(--accent); }
+  .upload:disabled { opacity: .6; cursor: progress; }
+  #uploadmsg { font-size: .82rem; margin: 0 2px 10px; }
+  #uploadmsg.ok { color: var(--ok); } #uploadmsg.err { color: var(--err); } #uploadmsg:empty { display: none; }
+
+  footer { margin-top: 40px; color: var(--muted); font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Credit Policy Assistant</h1>
+      <p class="sub">Ask about synthetic banking policies. Every answer cites the document and page it came from.</p>
+    </div>
+    <div class="topright">
+      <a class="apilink" href="/docs" target="_blank" rel="noopener" title="Interactive API documentation (Swagger UI)">API docs ↗</a>
+      <span id="health" class="pill">checking index…</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <form class="ask" id="form">
+        <input id="q" type="text" maxlength="1000" placeholder="Ask a question about lending, credit risk reviews or loan documentation…" autocomplete="off" autofocus>
+        <button class="go" id="go" type="submit">Ask</button>
+      </form>
+
+      <div id="questions">
+        <p class="label">Or try one of these</p>
+        <ul class="qlist" id="qlist"></ul>
+      </div>
+
+      <section id="out" aria-live="polite"></section>
+    </main>
+
+    <aside>
+      <p class="label">Policy documents</p>
+      <button class="upload" id="uploadbtn" type="button">+ Upload a PDF</button>
+      <input id="file" type="file" accept="application/pdf,.pdf" hidden>
+      <p id="uploadmsg" role="status"></p>
+      <div id="docs"><p class="hint">Loading…</p></div>
+      <p class="hint">These are the files answers are drawn from. Remove one and questions about it will no longer be answered. Drag a PDF here to add it. Use synthetic or public documents only.</p>
+    </aside>
+  </div>
+
+  <footer>Synthetic documents only. “Distance” is how far the closest passage is from the question (lower = closer match); it is a tuned cutoff, not a probability that an answer is correct.</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const out = $("out"), input = $("q"), btn = $("go");
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+// ---- Example questions (plain list) ----
+const QUESTIONS = [
+  ["What is the minimum DSCR for commercial loans?", "Direct"],
+  ["How often are loans rated Watch reviewed?", "Direct"],
+  ["How long are loan files retained after maturity or payoff?", "Direct"],
+  ["Above what loan amount is Credit Committee approval required?", "Direct"],
+  ["How often are Pass-rated loans reviewed, and what minimum provision applies to Substandard loans?", "Multiple passages"],
+  ["What appraisal requirement applies to real estate collateral, and what is the maximum loan-to-value for owner-occupied commercial real estate?", "Two documents"],
+  ["What is the current interest rate on a 30-year fixed mortgage?", "Should decline"],
+  ["What is the employee remote work policy?", "Should decline"],
+];
+QUESTIONS.forEach(([q, tag]) => {
+  const li = el("li");
+  const b = el("button");
+  b.type = "button";
+  b.appendChild(el("span", null, q));
+  b.appendChild(el("span", "tag" + (tag === "Should decline" ? " decline" : ""), tag));
+  b.onclick = () => { input.value = q; ask(q); };
+  li.appendChild(b);
+  $("qlist").appendChild(li);
+});
+
+// ---- Documents sidebar: list, upload, remove ----
+async function loadDocs() {
+  const box = $("docs");
+  try {
+    const r = await fetch("/documents");
+    const docs = await r.json();
+    box.replaceChildren();
+    if (!docs.length) { box.appendChild(el("p", "hint", "No documents yet. Upload a PDF to get started.")); return; }
+    docs.forEach((d) => {
+      const c = el("div", "doc");
+      c.dataset.file = d.filename;
+      const t = el("div", "t", d.title);
+      if (!d.indexed) t.appendChild(el("span", "notindexed", "not indexed"));
+      c.appendChild(t);
+      c.appendChild(el("div", "f", d.filename + " · " + d.pages + (d.pages === 1 ? " page" : " pages")));
+      const row = el("div", "actions");
+      const open = el("a", "open", "Open ↗");
+      open.href = "/pdfs/" + encodeURIComponent(d.filename); open.target = "_blank"; open.rel = "noopener";
+      row.appendChild(open);
+      const rm = el("button", "remove", "Remove");
+      rm.type = "button";
+      rm.onclick = () => removeDoc(d);
+      row.appendChild(rm);
+      c.appendChild(row);
+      box.appendChild(c);
+    });
+  } catch { box.replaceChildren(el("p", "hint", "Could not load the document list.")); }
+}
+
+function uploadMsg(text, kind) { const m = $("uploadmsg"); m.textContent = text; m.className = kind || ""; }
+
+async function uploadFile(file) {
+  if (!file) return;
+  if (!/\.pdf$/i.test(file.name)) { uploadMsg("Only PDF files can be uploaded.", "err"); return; }
+  const ub = $("uploadbtn");
+  ub.disabled = true; ub.textContent = "Indexing…"; uploadMsg("");
+  try {
+    const r = await fetch("/documents/" + encodeURIComponent(file.name), { method: "PUT", headers: { "Content-Type": "application/pdf" }, body: file });
+    let body = null; try { body = await r.json(); } catch {}
+    if (!r.ok) uploadMsg((body && body.detail) || "Upload failed.", "err");
+    else if (body.status === "unchanged") uploadMsg(`“${body.filename}” is already indexed (no changes).`, "ok");
+    else uploadMsg(`${body.status === "updated" ? "Updated" : "Added"} “${body.filename}” · ${body.chunks} passages` +
+                   (body.status === "updated" ? ` · now version ${body.version}` : "") + ".", "ok");
+  } catch { uploadMsg("Upload failed — is the server running?", "err"); }
+  finally { ub.disabled = false; ub.textContent = "+ Upload a PDF"; $("file").value = ""; loadDocs(); loadHealth(); }
+}
+
+async function removeDoc(d) {
+  if (!confirm(`Remove “${d.filename}”?\n\nIt will be deleted from the search index and the document folder. You can upload it again later.`)) return;
+  try {
+    const r = await fetch("/documents/" + encodeURIComponent(d.filename), { method: "DELETE" });
+    if (r.ok) uploadMsg(`Removed “${d.filename}”.`, "ok");
+    else { let b = null; try { b = await r.json(); } catch {} uploadMsg((b && b.detail) || "Could not remove the document.", "err"); }
+  } catch { uploadMsg("Could not remove the document.", "err"); }
+  loadDocs(); loadHealth();
+}
+
+$("uploadbtn").onclick = () => $("file").click();
+$("file").onchange = (e) => uploadFile(e.target.files[0]);
+const side = document.querySelector("aside");
+["dragenter", "dragover"].forEach((ev) => side.addEventListener(ev, (e) => { e.preventDefault(); side.classList.add("drag"); }));
+["dragleave", "drop"].forEach((ev) => side.addEventListener(ev, (e) => { e.preventDefault(); side.classList.remove("drag"); }));
+side.addEventListener("drop", (e) => uploadFile(e.dataTransfer.files[0]));
+loadDocs();
+
+function markCited(sources) {
+  const files = new Set((sources || []).map((s) => s.filename));
+  document.querySelectorAll(".doc").forEach((d) => d.classList.toggle("cited", files.has(d.dataset.file)));
+}
+
+// ---- Index health ----
+async function loadHealth() {
+  const pill = $("health");
+  try {
+    const r = await fetch("/health");
+    const h = await r.json();
+    pill.textContent = h.index_ready ? `Index ready · ${h.indexed_chunks} passages` : "No documents indexed — upload a PDF";
+    pill.className = "pill " + (h.index_ready ? "ok" : "bad");
+  } catch { pill.textContent = "API unreachable"; pill.className = "pill bad"; }
+}
+loadHealth();
+
+// ---- Answers ----
+function renderAnswer(text) {
+  const p = el("p", "answer");
+  text.split(/(\[\d+\])/).forEach((part) => {
+    const m = part.match(/^\[(\d+)\]$/);
+    if (m) {
+      const b = el("button", "cite", part);
+      b.type = "button";
+      b.title = "Jump to source " + m[1];
+      b.onclick = () => {
+        const t = $("src-" + m[1]);
+        if (!t) return;
+        t.scrollIntoView({ behavior: "smooth", block: "center" });
+        t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash");
+      };
+      p.appendChild(b);
+    } else p.appendChild(document.createTextNode(part));
+  });
+  return p;
+}
+
+function metaItem(label, value) {
+  const s = el("span");
+  s.appendChild(document.createTextNode(label + " "));
+  s.appendChild(el("b", null, value));
+  return s;
+}
+
+function showError(status, body) {
+  markCited([]);
+  out.replaceChildren();
+  const card = el("div", "card");
+  card.appendChild(el("span", "status err", "Something went wrong"));
+  let msg = "An unexpected error occurred. Please try again.";
+  if (status === 422) msg = "Please enter a question (1–1000 characters).";
+  else if (status === 503) msg = "No documents are indexed right now. Upload a PDF in the sidebar, then ask again.";
+  else if (status === 502) msg = "The language model could not be reached. Check the API key and billing, then try again.";
+  card.appendChild(el("p", "answer", msg));
+  card.appendChild(el("p", "why", "HTTP " + status + (body && body.error ? " · " + body.error : "")));
+  out.appendChild(card);
+}
+
+function showResult(d, ms, rid) {
+  out.replaceChildren();
+  markCited(d.sources);
+  const card = el("div", "card");
+  if (d.abstained) {
+    card.appendChild(el("span", "status warn", "Not enough evidence"));
+    card.appendChild(el("p", "answer", d.answer));
+    card.appendChild(el("p", "why", d.abstain_reason === "no_relevant_evidence"
+      ? `Why: no passage was close enough to the question (closest distance ${d.best_score}, cutoff 0.55), so the model was never asked to answer.`
+      : "Why: passages were found, but the model judged they did not contain the answer, so no citations are shown."));
+  } else {
+    card.appendChild(el("span", "status ok", "Answered from the documents"));
+    card.appendChild(renderAnswer(d.answer));
+  }
+  const meta = el("div", "meta");
+  meta.appendChild(metaItem("Time", (ms / 1000).toFixed(1) + " s"));
+  if (d.best_score != null) meta.appendChild(metaItem("Closest passage distance", String(d.best_score)));
+  if (rid) meta.appendChild(metaItem("Request", rid));
+  card.appendChild(meta);
+  out.appendChild(card);
+
+  if (d.sources && d.sources.length) {
+    const box = el("div", "sources");
+    box.appendChild(el("h3", null, "Sources"));
+    d.sources.forEach((s, i) => {
+      const c = el("div", "card src");
+      c.id = "src-" + (i + 1);
+      const head = el("div", "srchead");
+      head.appendChild(el("span", "n", "[" + (i + 1) + "]"));
+      head.appendChild(el("span", "f", s.filename));
+      head.appendChild(el("span", "d", "page " + s.page + " · distance " + s.score.toFixed(3)));
+      const a = el("a", null, "Open PDF page ↗");
+      a.href = "/pdfs/" + encodeURIComponent(s.filename) + "#page=" + s.page;
+      a.target = "_blank"; a.rel = "noopener";
+      head.appendChild(a);
+      c.appendChild(head);
+      c.appendChild(el("p", "srctext", s.text));
+      box.appendChild(c);
+    });
+    out.appendChild(box);
+  }
+}
+
+async function ask(q) {
+  q = q.trim();
+  if (!q) { showError(422, null); return; }
+  btn.disabled = true; btn.textContent = "Asking…";
+  out.replaceChildren(el("p", "loading", "Searching the policies…"));
+  const t0 = performance.now();
+  try {
+    const r = await fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }) });
+    const rid = r.headers.get("X-Request-ID");
+    let body = null;
+    try { body = await r.json(); } catch {}
+    if (!r.ok) showError(r.status, body); else showResult(body, performance.now() - t0, rid);
+  } catch {
+    showError(0, { error: "network_error" });
+  } finally { btn.disabled = false; btn.textContent = "Ask"; }
+}
+
+$("form").addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+</script>
+</body>
+</html>

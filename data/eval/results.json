@@ -1,0 +1,410 @@
+{
+  "run_at": "2026-11-19T03:26:11",
+  "config": {
+    "k": 3,
+    "embed_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "llm": "gpt-4o-mini",
+    "max_distance": 0.55,
+    "retrieval_only": false
+  },
+  "summary": {
+    "n_answerable": 8,
+    "n_unsupported": 2,
+    "hit_at_k": 1.0,
+    "recall_at_k": 1.0,
+    "best_score_answerable": [
+      0.2087,
+      0.3841,
+      0.3849,
+      0.3617,
+      0.3498,
+      0.2147,
+      0.3408,
+      0.274
+    ],
+    "best_score_unsupported": [
+      0.6851,
+      0.8359
+    ],
+    "false_abstention_rate": 0.0,
+    "abstention_rate_on_unsupported": 1.0,
+    "answer_correct_rate": 1.0,
+    "numbers_grounded_rate": 1.0,
+    "citation_precision": 1.0,
+    "citation_recall": 1.0
+  },
+  "records": [
+    {
+      "id": "q01",
+      "type": "direct",
+      "question": "What is the minimum DSCR for commercial loans?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.2087
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p3-c2",
+          "doc_id": "lending_requirements",
+          "page": 3,
+          "score": 0.4369
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p1-c0",
+          "doc_id": "lending_requirements",
+          "page": 1,
+          "score": 0.4852
+        }
+      ],
+      "best_score": 0.2087,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "The minimum debt service coverage ratio (DSCR) for commercial loans is 1.25x, calculated on the borrower's most recent audited financial statements [1].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q02",
+      "type": "direct",
+      "question": "How many months of operating history does a borrower need for an unsecured commercial loan?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p1-c0",
+          "doc_id": "lending_requirements",
+          "page": 1,
+          "score": 0.3841
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p3-c2",
+          "doc_id": "credit_risk_review",
+          "page": 3,
+          "score": 0.4619
+        },
+        {
+          "chunk_id": "loan_documentation-8c813d7cd3b6-p2-c1",
+          "doc_id": "loan_documentation",
+          "page": 2,
+          "score": 0.5045
+        }
+      ],
+      "best_score": 0.3841,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "A borrower must have at least 24 months of operating history to qualify for an unsecured commercial loan [1].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q03",
+      "type": "direct",
+      "question": "How often are loans rated Watch reviewed?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p1-c0",
+          "doc_id": "credit_risk_review",
+          "page": 1,
+          "score": 0.3849
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p4-c3",
+          "doc_id": "credit_risk_review",
+          "page": 4,
+          "score": 0.4174
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p3-c2",
+          "doc_id": "credit_risk_review",
+          "page": 3,
+          "score": 0.5329
+        }
+      ],
+      "best_score": 0.3849,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "Loans rated Watch are reviewed every 6 months [1].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q04",
+      "type": "direct",
+      "question": "How long are loan files retained after maturity or payoff?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "loan_documentation-8c813d7cd3b6-p2-c1",
+          "doc_id": "loan_documentation",
+          "page": 2,
+          "score": 0.3617
+        },
+        {
+          "chunk_id": "loan_documentation-8c813d7cd3b6-p4-c3",
+          "doc_id": "loan_documentation",
+          "page": 4,
+          "score": 0.4674
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p3-c2",
+          "doc_id": "credit_risk_review",
+          "page": 3,
+          "score": 0.5405
+        }
+      ],
+      "best_score": 0.3617,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "Loan files are retained for 7 years after loan maturity or payoff [1].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q05",
+      "type": "direct",
+      "question": "What is the maximum loan-to-value for owner-occupied commercial real estate?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p3-c2",
+          "doc_id": "lending_requirements",
+          "page": 3,
+          "score": 0.3498
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.5189
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p1-c0",
+          "doc_id": "lending_requirements",
+          "page": 1,
+          "score": 0.6115
+        }
+      ],
+      "best_score": 0.3498,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "The maximum loan-to-value for owner-occupied commercial real estate is 75% [1].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q06",
+      "type": "direct",
+      "question": "Above what loan amount is Credit Committee approval required?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p4-c3",
+          "doc_id": "lending_requirements",
+          "page": 4,
+          "score": 0.2147
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.457
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p3-c2",
+          "doc_id": "lending_requirements",
+          "page": 3,
+          "score": 0.4948
+        }
+      ],
+      "best_score": 0.2147,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "Loans above USD 5,000,000 require Credit Committee approval. [1]",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q07",
+      "type": "multi_passage",
+      "question": "How often are Pass-rated loans reviewed, and what minimum provision applies to Substandard loans?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p1-c0",
+          "doc_id": "credit_risk_review",
+          "page": 1,
+          "score": 0.3408
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p4-c3",
+          "doc_id": "credit_risk_review",
+          "page": 4,
+          "score": 0.3435
+        },
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p3-c2",
+          "doc_id": "credit_risk_review",
+          "page": 3,
+          "score": 0.4531
+        }
+      ],
+      "best_score": 0.3408,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "Pass-rated loans are reviewed annually [1]. Substandard loans require a specific provision of at least 15% of the outstanding balance, net of eligible collateral [3].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q08",
+      "type": "cross_document",
+      "question": "What appraisal requirement applies to real estate collateral, and what is the maximum loan-to-value for owner-occupied commercial real estate?",
+      "expected_abstain": false,
+      "retrieved": [
+        {
+          "chunk_id": "loan_documentation-8c813d7cd3b6-p3-c2",
+          "doc_id": "loan_documentation",
+          "page": 3,
+          "score": 0.274
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p3-c2",
+          "doc_id": "lending_requirements",
+          "page": 3,
+          "score": 0.3412
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.5605
+        }
+      ],
+      "best_score": 0.274,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "answer": "Real estate collateral requires an appraisal dated within 12 months of the loan approval date, performed by an approved third-party appraiser [1]. The maximum loan-to-value (LTV) for owner-occupied commercial real estate is 75% [2].",
+      "abstained": false,
+      "abstain_reason": null,
+      "answer_correct": true,
+      "numbers_grounded": true,
+      "citations": {
+        "has_valid_citations": true,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "id": "q09",
+      "type": "unsupported",
+      "question": "What is the current interest rate on a 30-year fixed mortgage?",
+      "expected_abstain": true,
+      "retrieved": [
+        {
+          "chunk_id": "credit_risk_review-8554e5b31e56-p1-c0",
+          "doc_id": "credit_risk_review",
+          "page": 1,
+          "score": 0.6851
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.6994
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p3-c2",
+          "doc_id": "lending_requirements",
+          "page": 3,
+          "score": 0.7231
+        }
+      ],
+      "best_score": 0.6851,
+      "answer": "I don't have enough evidence in the policy documents to answer that.",
+      "abstained": true,
+      "abstain_reason": "no_relevant_evidence"
+    },
+    {
+      "id": "q10",
+      "type": "unsupported",
+      "question": "What is the employee remote work policy?",
+      "expected_abstain": true,
+      "retrieved": [
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p1-c0",
+          "doc_id": "lending_requirements",
+          "page": 1,
+          "score": 0.8359
+        },
+        {
+          "chunk_id": "lending_requirements-12b673b40b2a-p2-c1",
+          "doc_id": "lending_requirements",
+          "page": 2,
+          "score": 0.8386
+        },
+        {
+          "chunk_id": "loan_documentation-8c813d7cd3b6-p4-c3",
+          "doc_id": "loan_documentation",
+          "page": 4,
+          "score": 0.882
+        }
+      ],
+      "best_score": 0.8359,
+      "answer": "I don't have enough evidence in the policy documents to answer that.",
+      "abstained": true,
+      "abstain_reason": "no_relevant_evidence"
+    }
+  ]
+}
